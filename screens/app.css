@@ -1,0 +1,161 @@
+/*
+ * 차 일기 — 공통 컴포넌트 스타일 (싶 디자인 시스템)
+ * - 값은 design/tokens.css(싶 토큰)만 쓴다. 숫자는 싶 pt 그대로.
+ * - 앱 영역(.app-window)을 zoom: 2 로 키워 차량 화면에 맞춘다 → 개발 시 dp = pt × 2
+ * - 클래스 이름 = 싶 컴포넌트 / Compose 컴포저블 이름 (예: .write-button → WriteButton())
+ * - 넓은 폭(가로 850pt)과 좁은 폭(세로 분할 420pt)은 container query 로 나눈다 (600pt 기준, 싶 넓은 화면 규칙과 같은 경계)
+ */
+@import url("../design/tokens.css");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap");
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #e9eaee; font-family: var(--font-sans); color: var(--gray5); -webkit-font-smoothing: antialiased; }
+body { min-height: 100vh; }
+img { display: block; }
+
+/* ── 프리뷰 툴바 (시안 뷰어용, 앱 UI 아님) ── */
+.preview-bar { position: sticky; top: 0; z-index: 10; display: flex; gap: 8px; align-items: center; padding: 12px 16px; background: var(--gray5); color: var(--gray1); font-size: 15px; }
+.preview-bar a { color: inherit; }
+.preview-bar .title { font-weight: 700; margin-right: auto; }
+.preview-bar button { font: inherit; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--gray4); background: transparent; color: inherit; cursor: pointer; }
+.preview-bar button[aria-pressed="true"] { background: var(--gray1); color: var(--gray5); }
+.preview-stage { padding: 16px; overflow: hidden; }
+.preview-scaler { transform-origin: top left; }
+body.shot .preview-bar { display: none; }
+body.shot .preview-stage { padding: 0; }
+
+/* ── 캔버스 = 차량 화면의 앱 영역 (가로 1700×1184px / 세로 분할 840×1184px) ── */
+.display { position: relative; width: 1700px; height: 1184px; background: var(--gray2); overflow: hidden; }
+.display[data-layout="portrait"] { width: 840px; }
+.app-slot { position: absolute; inset: 0; }
+.app-window { zoom: 2; position: relative; width: 850px; height: 592px; background: var(--gray2); overflow: hidden; container-type: inline-size; display: flex; flex-direction: column; }
+.display[data-layout="portrait"] .app-window { width: 420px; }
+
+/* ── 글자 (싶 type 스타일) ── */
+.t-title-light { font-size: 22px; line-height: 31px; font-weight: 300; }
+.t-title-bold { font-size: 22px; line-height: 31px; font-weight: 700; }
+.t-doc-title { font-size: 26px; line-height: 36px; font-weight: 700; }
+.t-doc-dday { font-size: 30px; line-height: 36px; font-weight: 800; }
+.t-cta { font-size: 17px; line-height: 24px; font-weight: 800; }
+.t-wish-title { font-size: 16px; line-height: 22px; font-weight: 600; }
+.t-body { font-size: 16px; line-height: 24px; font-weight: 400; }
+.t-doc-body { font-size: 16px; line-height: 28px; font-weight: 400; }
+.t-tab-on { font-size: 14px; line-height: 20px; font-weight: 800; }
+.t-label { font-size: 14px; line-height: 20px; font-weight: 500; }
+.t-body-sm { font-size: 14px; line-height: 20px; font-weight: 400; }
+.t-caption { font-size: 12px; line-height: 17px; font-weight: 500; }
+.t-badge { font-size: 11px; line-height: 14px; font-weight: 700; }
+/* Headline: 1행 title-light, 2행 핵심만 title-bold, 숫자 강조는 seep-blue */
+.headline { font-size: 22px; line-height: 31px; font-weight: 300; }
+.headline b { font-weight: 700; }
+.headline em { font-style: normal; font-weight: 700; color: var(--seep-blue); }
+.c-secondary, .c-tertiary { color: var(--gray4); }
+.c-positive { color: var(--seep-blue); }
+.c-green { color: var(--tennis-green); }
+.num { font-variant-numeric: tabular-nums; font-weight: 800; }
+
+/* ── AppHeader ── */
+/* 싶 홈 헤드라인: 헤드라인 왼쪽, 일러스트(여기선 차 스탬프) 오른쪽, 카테고리 탭은 그 아래 줄 */
+.app-header { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 12px; padding: 18px var(--space-page) 14px var(--space-header); }
+.app-header__title { flex: 1; min-width: 0; }
+.app-header > .stamp { order: 2; }
+.app-header > .tab-bar { order: 3; flex-basis: 100%; margin-left: -4px; }
+.app-content { flex: 1; min-height: 0; padding: 0 var(--space-page) var(--space-page); display: flex; flex-direction: column; gap: var(--space-list-gap); overflow: hidden; }
+
+/* ── CategoryTabs: 바탕 없이, 선택된 탭만 seep-blue 알약 + shadow-tab ── */
+.tab-bar { display: inline-flex; align-items: center; gap: 4px; }
+.tab-bar__item { height: 30px; padding: 0 18px; border-radius: var(--radius-tab); display: inline-flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 500; color: var(--gray4); white-space: nowrap; }
+.tab-bar__item.is-selected { background: var(--seep-blue); color: var(--gray1); font-weight: 800; box-shadow: var(--shadow-tab); }
+
+/* ── 버튼 ── */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 0; font-family: inherit; white-space: nowrap; cursor: pointer; }
+/* WriteButton (CTA): 높이 50, radius-cta, 좌우 32, ExtraBold 17 */
+.btn--l { height: 50px; padding: 0 32px; border-radius: var(--radius-cta); font-size: 17px; font-weight: 800; }
+/* 작은 알약 (탭 크기): 높이 30, radius-tab, ExtraBold 14 */
+.btn--m, .btn--s { height: 30px; padding: 0 14px; border-radius: var(--radius-tab); font-size: 14px; font-weight: 800; }
+.btn--filled { background: var(--tennis-green); color: var(--gray1); }
+.btn--filled:disabled { background: var(--cta-disabled); }
+.btn--basic { background: var(--gray2); color: var(--gray5); }          /* 되돌리는 쪽 CTA: gray2 + gray5 */
+.btn--text { background: none; height: 44px; color: var(--gray4); font-size: 14px; font-weight: 500; }  /* "다음에 할게요" */
+.btn--link { background: none; height: 32px; padding: 0; color: var(--seep-blue); font-size: 14px; font-weight: 800; }  /* 링크형 "제목 ›" */
+.btn--link img { width: 16px; height: 16px; }
+.btn--block { width: 100%; }
+.icon-btn { width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; background: none; border: 0; flex: none; }
+.icon-btn img { width: 24px; height: 24px; }
+
+/* ── 카드 (홈 카드·위시 셀과 같은 면): gray1, radius-card, 그림자 없음 ── */
+.card { background: var(--gray1); border-radius: var(--radius-card); padding: 16px 16px 16px var(--space-card); display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.card__eyebrow { display: flex; align-items: center; gap: 4px; font-size: 12px; line-height: 17px; font-weight: 500; color: var(--gray4); }
+.card__eyebrow .chev { margin-left: auto; width: 20px; height: 20px; }
+
+/* ── 스탬프 = 싶 배지 메달 (gray2 원 + gray2-5 링, 가운데 이모지) ── */
+.stamp { width: 40px; height: 40px; flex: none; }
+.stamp--s { width: 30px; height: 30px; }
+.stamp--l { width: 56px; height: 56px; }
+.stamp--xl { width: 72px; height: 72px; }
+.stamp-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ── 가족 = 이모지 하나 (데이터). 상세 상단처럼 원 안에 둘 때만 gray2 원 ── */
+.avatar { width: 32px; height: 32px; border-radius: 50%; flex: none; display: inline-flex; align-items: center; justify-content: center; font-size: 20px; line-height: 1; background: var(--gray2); }
+.avatar--s { width: 24px; height: 24px; font-size: 14px; }
+.avatar--l { width: 44px; height: 44px; font-size: 30px; background: none; }
+.avatar-stack { display: flex; }
+.avatar-stack .avatar { border: 2px solid var(--gray1); margin-left: -6px; }
+.avatar-stack .avatar:first-child { margin-left: 0; }
+
+/* ── 가족 고르기 = 싶 그리드 셀 + 체크 원(ic_check_on/off) ── */
+/* 1줄: 이모지 / 2줄: 이름 + 오른쪽 체크 / 3줄: 보조 (그리드 셀의 "이모지 위 · 제목 · 오른쪽 아래 체크") */
+.member-toggle { display: grid; grid-template-columns: 1fr auto; align-content: space-between; column-gap: 6px; padding: var(--space-card) 12px 12px var(--space-card); border-radius: var(--radius-card); background: var(--gray2); min-width: 0; font-size: 16px; line-height: 22px; font-weight: 600; }
+.member-toggle > .avatar { grid-column: 1 / -1; }
+.member-toggle .check { grid-column: 2; grid-row: 2 / span 2; align-self: end; width: 30px; height: 30px; }
+.member-toggle .hint { grid-column: 1; grid-row: 3; font-size: 11px; line-height: 14px; font-weight: 700; color: var(--seep-blue); }
+
+/* ── 선택지 알약 = 싶 카테고리 트랙 안 탭 (category-track / category-text-off / seep-blue) ── */
+.chip { display: inline-flex; align-items: center; height: 30px; padding: 0 14px; border-radius: var(--radius-tab); background: var(--category-track); color: var(--category-text-off); font-size: 14px; font-weight: 500; white-space: nowrap; }
+.chip.is-selected { background: var(--seep-blue); color: var(--gray1); font-weight: 800; box-shadow: var(--shadow-tab); }
+.chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* ── StepProgressBar: 트랙 gray2-5, 채움 tennis-green, 높이 4 (큰 상자 8) ── */
+.progress { height: 4px; border-radius: 2px; background: var(--gray2-5); overflow: hidden; }
+.progress--lg { height: 8px; border-radius: 4px; }
+.progress > span { display: block; height: 100%; border-radius: inherit; background: var(--tennis-green); }
+
+/* ── 줄 목록 (상세 문서의 단계 줄과 같은 결): 높이 44, 사이 구분선 1 gray2-5 ── */
+.list { display: flex; flex-direction: column; }
+.list-item { min-height: 44px; display: flex; align-items: center; gap: 12px; padding: 6px 0; border-bottom: 1px solid var(--gray2-5); font-size: 16px; }
+.list-item:last-child { border-bottom: 0; }
+.list-item__body { flex: 1; min-width: 0; }
+.list-item__trail { display: flex; align-items: center; gap: 6px; color: var(--gray4); font-size: 14px; }
+.list-item__trail img { width: 20px; height: 20px; }
+.list-item .check { width: 30px; height: 30px; flex: none; }
+
+/* ── 바텀시트 (PanModal): 위 라운드 20 + 인디케이터, 헤드라인 → 내용 → CTA → 텍스트 버튼 ── */
+.dim { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.4); display: flex; align-items: flex-end; justify-content: center; z-index: 5; }  /* PanModal 기본 dim */
+.popup { width: 100%; max-width: 600px; background: var(--gray1); border-radius: 20px 20px 0 0; padding: 24px var(--space-page) var(--space-cta-bottom); display: flex; flex-direction: column; gap: 20px; position: relative; }
+.popup::before { content: ""; position: absolute; top: 8px; left: 50%; width: 36px; height: 5px; margin-left: -18px; border-radius: 3px; background: var(--gray2-5); }
+.popup__head { display: flex; align-items: center; gap: 12px; }
+.popup__actions { display: flex; flex-direction: column; align-items: stretch; gap: 6px; }
+
+/* ── Toast: gray5, 흰 Bold 15, radius-toast ── */
+.toast { position: absolute; left: var(--space-page); right: var(--space-page); bottom: 84px; padding: 14px 16px; border-radius: var(--radius-toast); background: var(--gray5); color: var(--gray1); display: flex; align-items: center; justify-content: space-between; font-size: 15px; font-weight: 700; z-index: 6; }
+
+/* ── InputField: 라벨 + gray2 상자(라운드 12, 높이 52, 좌우 16) ── */
+.field-label { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 500; }
+.field { height: 52px; border-radius: var(--radius-card); background: var(--gray2); padding: 0 16px; display: flex; align-items: center; font-size: 16px; color: var(--gray5); gap: 1px; }
+.field.is-empty { color: var(--gray3); }
+.field .caret { width: 2px; height: 20px; background: var(--seep-blue); }
+
+/* ── 배치 도우미 ── */
+.row { display: flex; gap: 10px; min-width: 0; }
+.col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.grow { flex: 1; min-width: 0; }
+.center { align-items: center; }
+.between { justify-content: space-between; }
+.wrap { flex-wrap: wrap; }
+.g4 { gap: 4px; } .g8 { gap: 8px; } .g16 { gap: 16px; } .g20 { gap: 20px; }
+.only-portrait { display: none; }
+@container (max-width: 600px) {
+  .only-landscape { display: none !important; }
+  .only-portrait { display: revert; }
+  .tab-bar__item { padding: 0 12px; }
+}

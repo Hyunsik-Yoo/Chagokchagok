@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>04 주행 중</title>
+<link rel="stylesheet" href="app.css">
+<style>
+  /* DrivingScreen — 숫자 2개 + 상태 1줄 + 스탬프, 읽을 글 없음 */
+  .driving { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; padding: var(--space-page); text-align: center; }
+  .driving__badge { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 14px; border-radius: var(--radius-tab); background: var(--gray1); font-size: 14px; font-weight: 800; }
+  .rec-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--tennis-green); }
+  .driving__stats { display: flex; gap: 32px; }
+  .driving__stats .num { font-size: 30px; line-height: 36px; }
+  .driving__stats .unit { font-size: 16px; font-weight: 700; }
+  .driving__stamps { display: flex; gap: 12px; }
+  .driving__stamps figure { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; font-weight: 500; color: var(--gray4); }
+  .btn--remember { min-width: 280px; background: var(--gray1); }
+  @container (max-width: 600px) {
+    .driving__stats { flex-direction: column; gap: 4px; }
+    .btn--remember { min-width: 0; width: 100%; }
+  }
+</style>
+</head>
+<body data-title="04 주행 중 — 조용히 기록 (최소 정보 · 알림 없음)" data-portrait="true">
+<div class="display">
+  <div class="app-slot">
+    <section class="app-window driving-screen">
+      <div class="driving">
+        <div class="driving__badge"><span class="rec-dot"></span>기억하는 중</div>
+        <div class="row center g32">
+          <svg class="stamp stamp--xl"><use href="#stamp-car"/></svg>
+          <div class="avatar-stack only-landscape">
+            <span class="avatar avatar--l">👨</span>
+            <span class="avatar avatar--l">👩</span>
+            <span class="avatar avatar--l">👦</span>
+          </div>
+        </div>
+        <div class="driving__stats">
+          <div><span class="num">42</span><span class="unit"> km</span></div>
+          <div><span class="num">48</span><span class="unit"> 분</span></div>
+        </div>
+        <div class="driving__stamps">
+          <figure><svg class="stamp"><use href="#stamp-rain"/></svg>비</figure>
+          <figure><svg class="stamp"><use href="#stamp-highway"/></svg>긴 길</figure>
+        </div>
+        <button class="btn btn--l btn--basic btn--remember">지금 기억하기</button>
+      </div>
+    </section>
+  </div>
+</div>
+<script src="stamps.js"></script>
+<script src="frame.js"></script>
+</body>
+</html>

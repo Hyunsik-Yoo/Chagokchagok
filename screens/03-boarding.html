@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>03 탑승</title>
+<link rel="stylesheet" href="app.css">
+<style>
+  /* BoardingSheet */
+  .bg-skeleton { flex: 1; padding: 0 var(--space-page) var(--space-page); display: grid; grid-template-columns: 1.15fr 1fr; gap: var(--space-list-gap); }
+  .bg-skeleton div { border-radius: var(--radius-card); background: var(--gray1); }
+  .members { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-list-gap); }
+  .members .member-toggle { min-height: 96px; }
+  .auto-close { display: flex; align-items: center; gap: 8px; }
+  .auto-close .progress { flex: 1; }
+  @container (max-width: 600px) {
+    .members { grid-template-columns: repeat(2, 1fr); }
+    .bg-skeleton { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body data-title="03 탑승 — 오늘 누구랑 가? (뒷문 열림 → 원탭 선택)" data-portrait="true">
+<div class="display">
+  <div class="app-slot">
+    <section class="app-window boarding-screen">
+      <header class="app-header"><svg class="stamp"><use href="#stamp-car"/></svg><div class="app-header__title t-title-bold">소나의 일기</div></header>
+      <div class="bg-skeleton"><div></div><div></div></div>
+
+      <div class="dim">
+        <div class="popup boarding-popup">
+          <div class="popup__head">
+            <svg class="stamp"><use href="#stamp-car"/></svg>
+            <div class="grow">
+              <div class="headline">뒷자리에 누가 탔어?<br><b>오늘은 누구랑 가?</b></div>
+            </div>
+          </div>
+          <div class="members">
+            <div class="member-toggle is-selected"><span class="avatar avatar--l">👨</span>아빠<img class="check" src="assets/icons/ic_check_on.png" alt="선택됨"></div>
+            <div class="member-toggle is-selected"><span class="avatar avatar--l">👩</span>엄마<img class="check" src="assets/icons/ic_check_on.png" alt="선택됨"></div>
+            <div class="member-toggle is-selected"><span class="avatar avatar--l">👦</span>준<span class="hint">뒷좌석 감지</span><img class="check" src="assets/icons/ic_check_on.png" alt="선택됨"></div>
+            <div class="member-toggle"><span class="avatar avatar--l">👧</span>서아<img class="check" src="assets/icons/ic_check_off.png" alt=""></div>
+          </div>
+          <div class="auto-close t-caption c-tertiary">
+            <span>지난번 멤버로 자동 출발</span>
+            <div class="progress"><span style="width:60%"></span></div>
+            <span class="num">6초</span>
+          </div>
+          <div class="popup__actions">
+            <button class="btn btn--l btn--filled">출발!</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<script src="stamps.js"></script>
+<script src="frame.js"></script>
+</body>
+</html>

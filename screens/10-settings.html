@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>10 설정</title>
+<link rel="stylesheet" href="app.css">
+<style>
+  /* SettingsScreen */
+  .st { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-list-gap); }
+  .demo-log { display: flex; flex-direction: column; }
+  .demo-log .list-item { min-height: 36px; padding: 2px 0; }
+  .demo-log .num { width: 48px; color: var(--gray4); }
+  .demo-log .is-now { color: var(--seep-blue); font-weight: 700; }
+  .speed { display: inline-flex; gap: 4px; }
+  .speed span { height: 30px; padding: 0 12px; display: flex; align-items: center; border-radius: var(--radius-tab); font-size: 14px; font-weight: 500; color: var(--gray4); }
+  .speed span.is-selected { background: var(--seep-blue); color: var(--gray1); font-weight: 800; box-shadow: var(--shadow-tab); }
+</style>
+</head>
+<body data-title="10 설정 + 시연 모드">
+<div class="display">
+  <div class="app-slot">
+    <section class="app-window settings-screen">
+      <header class="app-header">
+        <svg class="stamp"><use href="#stamp-car"/></svg>
+        <div class="app-header__title t-title-bold">설정</div>
+        <nav class="tab-bar">
+          <div class="tab-bar__item">홈</div>
+          <div class="tab-bar__item">일기</div>
+          <div class="tab-bar__item">거리</div>
+          <div class="tab-bar__item is-selected">설정</div>
+        </nav>
+      </header>
+      <main class="app-content">
+        <div class="st">
+          <article class="card">
+            <div class="list">
+              <div class="list-item"><div class="list-item__body t-body">차 이름</div><div class="list-item__trail">소나<img src="assets/icons/ic_arrow_right.png" alt=""></div></div>
+              <div class="list-item"><div class="list-item__body t-body">가족 관리</div><div class="list-item__trail">
+                <div class="avatar-stack"><span class="avatar avatar--s">👨</span><span class="avatar avatar--s">👩</span><span class="avatar avatar--s">👦</span><span class="avatar avatar--s">👧</span></div>
+                <img src="assets/icons/ic_arrow_right.png" alt=""></div></div>
+              <div class="list-item"><div class="list-item__body"><div class="t-body">탑승할 때 "누구랑 가?" 묻기</div><div class="t-caption c-tertiary">뒷문이 열리면 물어봐요</div></div><img class="check" src="assets/icons/ic_check_on.png" alt="켜짐"></div>
+              <div class="list-item"><div class="list-item__body"><div class="t-body">도착하면 "여기 어디?" 묻기</div><div class="t-caption c-tertiary">기본 내비 목적지는 자동으로 적어요</div></div><img class="check" src="assets/icons/ic_check_on.png" alt="켜짐"></div>
+              <div class="list-item"><div class="list-item__body"><div class="t-body">하루 끝 일기 알림</div><div class="t-caption c-tertiary">시동을 끌 때 한 번만</div></div><img class="check" src="assets/icons/ic_check_off.png" alt="꺼짐"></div>
+            </div>
+          </article>
+
+          <!-- DemoModeCard -->
+          <article class="card demo-card">
+            <div class="card__eyebrow c-positive">시연 모드 · PT용</div>
+            <div class="t-wish-title">녹화한 하루를 재생해서 일기가 써지는 장면을 보여줘요</div>
+            <div class="chip-group">
+              <span class="chip is-selected">할머니 댁 87km ☔</span><span class="chip">마트 밤길 24km 🌙</span>
+            </div>
+            <div class="row center between"><span class="t-body-sm c-secondary">재생 속도</span><div class="speed"><span>×1</span><span>×10</span><span class="is-selected">×60</span></div></div>
+            <div class="demo-log">
+              <div class="list-item"><span class="num t-body-sm">10:02</span><span class="t-body-sm">뒷문 열림 → 탑승 팝업</span></div>
+              <div class="list-item"><span class="num t-body-sm">10:42</span><span class="t-body-sm">와이퍼 켜짐 → ☔ 비 스탬프</span></div>
+              <div class="list-item is-now"><span class="num t-body-sm">12:20</span><span class="t-body-sm is-now">P단 → 도착 팝업 ▶ 재생 중</span></div>
+            </div>
+            <button class="btn btn--l btn--filled btn--block">시연 시작</button>
+          </article>
+        </div>
+      </main>
+    </section>
+  </div>
+</div>
+<script src="stamps.js"></script>
+<script src="frame.js"></script>
+</body>
+</html>

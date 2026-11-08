@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>09 특별한 날</title>
+<link rel="stylesheet" href="app.css">
+<style>
+  /* SpecialDayScreen (목업) */
+  .sp { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-list-gap); }
+  .sp .card { justify-content: space-between; }
+  .sp .card .stamp--l { align-self: flex-start; }
+  .letter { padding: 12px 14px; border-radius: var(--radius-card); background: var(--gray2); font-size: 14px; line-height: 20px; font-weight: 600; }  /* 싶 '올해의 한 줄' 상자 */
+  .stat-list .list-item { min-height: 44px; }
+  .stat-list .num { font-size: 16px; color: var(--gray5); }
+</style>
+</head>
+<body data-title="09 특별한 날 (목업) — 1년 전 오늘 · 타임캡슐 · 연말 결산">
+<div class="display">
+  <div class="app-slot">
+    <section class="app-window special-screen">
+      <header class="app-header">
+        <svg class="stamp"><use href="#stamp-car"/></svg>
+        <div class="app-header__title">
+          <div class="headline">오늘은 조금<br><b>특별한 날이에요</b></div>
+        </div>
+      </header>
+      <main class="app-content">
+        <div class="sp">
+          <!-- OneYearAgoCard -->
+          <article class="card">
+            <div class="card__eyebrow">1년 전 오늘 · 2025년 11월 1일</div>
+            <svg class="stamp stamp--l"><use href="#stamp-cold"/></svg>
+            <p class="t-wish-title">작년 오늘은 준이랑 처음으로 눈 구경을 갔어. 엉덩이 따뜻하게 해주느라 바빴지 ❄️</p>
+            <div class="t-body-sm c-tertiary">그때 준이는 6살이었어</div>
+            <button class="btn btn--l btn--filled btn--block">그날 일기 보기</button>
+          </article>
+
+          <!-- TimeCapsuleCard -->
+          <article class="card">
+            <div class="card__eyebrow">타임캡슐 편지</div>
+            <svg class="stamp stamp--l"><use href="#stamp-letter"/></svg>
+            <div class="letter">준아, 지구 한 바퀴를 같이 달린 날 이 편지를 열어봐. 엄마 아빠는 그 모든 길이 행복했어. 💌</div>
+            <div class="t-body-sm c-tertiary">열리는 날: 준이랑 40,075km 달성할 때</div>
+            <button class="btn btn--l btn--basic btn--block">편지 쓰기</button>
+          </article>
+
+          <!-- YearEndCard -->
+          <article class="card">
+            <div class="card__eyebrow">2026 우리 가족 결산</div>
+            <div><span class="num t-doc-dday">8,420</span><span class="t-wish-title"> km 함께 달렸어</span></div>
+            <div class="list stat-list">
+              <div class="list-item"><svg class="stamp stamp--s"><use href="#stamp-flag"/></svg><div class="list-item__body t-body">할머니 댁 간 날</div><span class="num">32</span></div>
+              <div class="list-item"><svg class="stamp stamp--s"><use href="#stamp-rain"/></svg><div class="list-item__body t-body">비 오는 날</div><span class="num">41</span></div>
+              <div class="list-item"><svg class="stamp stamp--s"><use href="#stamp-star"/></svg><div class="list-item__body t-body">벨트 칭찬</div><span class="num">187</span></div>
+            </div>
+            <button class="btn btn--l btn--filled btn--block">결산 펼쳐보기</button>
+          </article>
+        </div>
+      </main>
+    </section>
+  </div>
+</div>
+<script src="stamps.js"></script>
+<script src="frame.js"></script>
+</body>
+</html>

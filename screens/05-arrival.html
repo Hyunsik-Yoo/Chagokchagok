@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>05 도착</title>
+<link rel="stylesheet" href="app.css">
+<style>
+  /* ArrivalSheet */
+  .bg-skeleton { flex: 1; padding: 0 var(--space-page) var(--space-page); display: grid; grid-template-columns: 1.15fr 1fr; gap: var(--space-list-gap); }
+  .bg-skeleton div { border-radius: var(--radius-card); background: var(--gray1); }
+  .navi-suggest { display: flex; align-items: center; gap: 12px; padding: 12px var(--space-card); border-radius: var(--radius-card); background: var(--gray2); }
+  @container (max-width: 600px) {
+    .bg-skeleton { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body data-title="05 도착 — 여기 어디였어? (원탭 장소 입력)" data-portrait="true">
+<div class="display">
+  <div class="app-slot">
+    <section class="app-window arrival-screen">
+      <header class="app-header"><svg class="stamp"><use href="#stamp-car"/></svg><div class="app-header__title t-title-bold">소나의 일기</div></header>
+      <div class="bg-skeleton"><div></div><div></div></div>
+
+      <div class="dim">
+        <div class="popup arrival-popup">
+          <div class="popup__head">
+            <svg class="stamp"><use href="#stamp-flag"/></svg>
+            <div class="grow">
+              <div class="headline"><span class="num">87</span>km 함께 달렸어!<br><b>여기 어디였어?</b></div>
+            </div>
+          </div>
+
+          <!-- NaviHelper 목적지가 있을 때 -->
+          <div class="navi-suggest">
+                        <div class="grow">
+              <div class="t-caption c-tertiary">내비 목적지</div>
+              <div class="t-wish-title">할머니 댁 맞지?</div>
+            </div>
+            <button class="btn btn--m btn--filled">맞아</button>
+          </div>
+
+          <!-- 자주 가는 곳 (요일·시간대 순) -->
+          <div class="col g16">
+            <div class="t-caption c-tertiary">자주 가는 곳</div>
+            <div class="chip-group">
+              <span class="chip">집</span>
+              <span class="chip">마트</span>
+              <span class="chip">준이 학교</span>
+              <span class="chip">태권도</span>
+              <span class="chip">새 장소</span>
+            </div>
+          </div>
+          <div class="popup__actions">
+            <button class="btn btn--m btn--text">다음에 할게요</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="toast" style="display:none">👏 할머니 댁, 기억했어!</div>
+    </section>
+  </div>
+</div>
+<script src="stamps.js"></script>
+<script src="frame.js"></script>
+</body>
+</html>
