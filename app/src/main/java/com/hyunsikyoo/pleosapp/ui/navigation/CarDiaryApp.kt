@@ -76,7 +76,6 @@ fun CarDiaryApp(
                 childName = childName,
                 readyToRecord = readyToRecord,
                 narration = narration,
-                onLeaveApp = onLeaveApp,
                 onStartRecording = app::startRecording,
                 onOpenDiary = { d -> app.navigate(Screen.Diary(d?.date)) },
                 onPlay = diaryViewModel::play,

@@ -81,7 +81,6 @@ fun HomeScreen(
     childName: String,
     readyToRecord: Boolean,
     narration: NarrationState,
-    onLeaveApp: () -> Unit,
     onStartRecording: () -> Unit,
     onOpenDiary: (Diary?) -> Unit,
     onPlay: (Diary) -> Unit,
@@ -96,10 +95,11 @@ fun HomeScreen(
     CarDiaryAppFrame(
         header = {
             // 1 헤더 Nav=Mix: [기록 시작]은 탑승 확인(W3) 뒤 "기록 준비됨"(W2-1), [설정]은 W9
+            // 첫 화면이라 뒤로 가기는 뺀다(11/9 현식). 나가기는 Pleos 하단 메뉴로
             CarDiaryHeader(
                 title = "${carName}의 일기장",
                 nav = HeaderNav.Mix,
-                onBack = onLeaveApp,
+                showBack = false,
                 actions = listOf(
                     HeaderNavItem(if (readyToRecord) "기록 준비됨" else "기록 시작", onStartRecording),
                     HeaderNavItem("설정", onOpenSettings, icon = CarDiaryIcons.Settings),

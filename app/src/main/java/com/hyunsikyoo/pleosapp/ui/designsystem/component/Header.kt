@@ -41,7 +41,8 @@ data class HeaderNavItem(
  * Header (Figma 50:3924). 1700×110, 배경 없음(앱 창 바탕 비침), 아래 검정 2px 선.
  * - 왼쪽 Icon Button(arrow-left) + 제목 30 Bold #131417.
  * - Both: 오른쪽에 '‹ 이전 일기' '다음 일기 ›' 30 Bold, 세로선으로 칸 구분.
- * - 쓰는 곳: 일기 = Both, 주행 중·달력·설정 = BackOnly, 홈 = Mix(기록 시작 · 설정).
+ * - 쓰는 곳: 일기 = Both, 주행 중·달력·설정 = BackOnly, 홈 = Mix(기록 시작 · 설정, 뒤로 없음).
+ * - [showBack] false면 Nav와 상관없이 왼쪽 뒤로 가기를 뺀다 (첫 화면 홈).
  */
 @Composable
 fun CarDiaryHeader(
@@ -49,6 +50,7 @@ fun CarDiaryHeader(
     modifier: Modifier = Modifier,
     nav: HeaderNav = HeaderNav.BackOnly,
     onBack: () -> Unit = {},
+    showBack: Boolean = true,
     prev: HeaderNavItem? = null,
     next: HeaderNavItem? = null,
     /** Mix: 오른쪽 칸들 (세로선으로 구분) */
@@ -71,7 +73,7 @@ fun CarDiaryHeader(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Spacer(Modifier.width(CarDiaryDimens.PagePadding))
-        if (nav != HeaderNav.None) {
+        if (nav != HeaderNav.None && showBack) {
             CarDiaryIconButton(CarDiaryIcons.ArrowLeft, contentDescription = "뒤로 가기", onClick = onBack)
             Spacer(Modifier.width(40.dp))
         }
