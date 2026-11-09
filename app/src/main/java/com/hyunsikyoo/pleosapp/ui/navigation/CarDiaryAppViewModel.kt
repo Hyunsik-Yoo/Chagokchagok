@@ -103,9 +103,12 @@ class CarDiaryAppViewModel(app: Application) : AndroidViewModel(app) {
     private var arrivalPaused = false
 
     private val _gear = MutableStateFlow(GearState.Unknown)
+    /** 지금 기어 (시연 조작 패널 표시용) */
+    val gear: StateFlow<GearState> = _gear.asStateFlow()
 
     /** 시연: 다음 트립을 내비 목적지 없이 시작(W6-1 확인용) */
-    private var nextTripWithoutDestination = false
+    private val _nextTripWithoutDestination = MutableStateFlow(false)
+    val nextTripWithoutDestination: StateFlow<Boolean> = _nextTripWithoutDestination.asStateFlow()
 
     private var tripEndJob: Job? = null
     private var arrivalJob: Job? = null
@@ -185,8 +188,8 @@ class CarDiaryAppViewModel(app: Application) : AndroidViewModel(app) {
         openPopup(AppPopup.Boarding)
     }
 
-    fun demoNextTripWithoutDestination() {
-        nextTripWithoutDestination = true
+    fun demoNextTripWithoutDestination(on: Boolean = true) {
+        _nextTripWithoutDestination.value = on
     }
 
     private fun startOrContinueDriving() {
@@ -200,8 +203,8 @@ class CarDiaryAppViewModel(app: Application) : AndroidViewModel(app) {
         _readyToRecord.value = false
         if (_trip.value == null) {
             val now = LocalDateTime.now()
-            val noDest = nextTripWithoutDestination
-            nextTripWithoutDestination = false
+            val noDest = _nextTripWithoutDestination.value
+            _nextTripWithoutDestination.value = false
             _trip.value = LiveTrip(
                 startAt = now,
                 fromPlace = "우리 집",

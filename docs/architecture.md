@@ -13,6 +13,7 @@
    - 화면 흐름(W0): `ui/navigation/CarDiaryAppViewModel` — 기어 P→D면 어디서든 주행 중으로(탑승 팝업은 확정, 도착 팝업은 "나중에"), D→P 후 트립 종료(10분, 시연 모드 5초)면 도착 팝업 → 일기, 뒷문 열림 + 정차면 탑승 팝업, 도착 팝업 30초 자동 저장
    - 차량 신호: `data/vehicle/VehicleSignals` — Vehicle SDK Gear(`registerGearSelection`, CAR_DRIVE)·Door(`registerDoorPosition` 뒷문 2개, CAR_DOORS). Gear는 문서 도메인 목록엔 없지만 SDK 2.3.2에 있다
    - 시연: 디버그 빌드 `adb shell am broadcast -a com.hyunsikyoo.pleosapp.DEMO --es signal door|drive|park|end|nodest` (nodest = 다음 트립을 내비 목적지 없이 → W6-1)
+   - 시연 조작 패널: 디버그 빌드에서 앱 영역 왼쪽 아래 구석을 길게 누르면 열림(`ui/navigation/DemoControlPanel`). 뒷문 열림·주행 D·주차 P·트립 끝내기·목적지 없이 — adb 신호와 같은 동작
    - 아직 시연 값: 내비 목적지·ETA(NaviHelper), 좌석 착좌로 탑승 덮어쓰기(Seat), 위치·근처 후보(FusedLocation·위키백과), 실제 명장면 감지·일기 문장 생성, 저장(Room)
 4. **디자인이 완료되면 해당 화면에만 디자인을 입힌다** ← 완료 (2026-11-08, 시안 「차 일기 Pleos 화면 시안」 디자인 완료 페이지)
    - 디자인 시스템: 회색을 검정 투명도로 교체, Button Small(72), Checkbox·Text Field·Toast 추가, List Row Checkbox/아이콘 줄, Header Mix, Popup 뒤로 가기·높이 자동, Seat Card 나이 태그, Calendar Day Short 삭제·Today 추가

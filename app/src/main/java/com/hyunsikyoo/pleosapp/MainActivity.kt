@@ -20,6 +20,7 @@ import com.hyunsikyoo.pleosapp.ui.navigation.CarDiaryAppViewModel
  * 앱 진입점.
  * - 디자인 시스템 카탈로그: `adb shell am start -n com.hyunsikyoo.pleosapp/.MainActivity --ez catalog true`
  * - 시연 신호(디버그 빌드만): `adb shell am broadcast -a com.hyunsikyoo.pleosapp.DEMO --es signal park|drive|door|end|nodest`
+ * - 시연 조작 패널(디버그 빌드만): 앱 영역 왼쪽 아래 구석을 길게 누르기. 위 신호와 같은 동작
  */
 class MainActivity : ComponentActivity() {
 
@@ -49,7 +50,7 @@ class MainActivity : ComponentActivity() {
                 if (showCatalog) {
                     DesignSystemCatalog()
                 } else {
-                    CarDiaryApp(onLeaveApp = { moveTaskToBack(true) }, app = appViewModel)
+                    CarDiaryApp(onLeaveApp = { moveTaskToBack(true) }, demoControls = debuggable, app = appViewModel)
                 }
             }
         }

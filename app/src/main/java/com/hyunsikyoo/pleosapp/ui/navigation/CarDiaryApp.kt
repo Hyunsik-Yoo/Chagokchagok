@@ -6,12 +6,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hyunsikyoo.pleosapp.data.demo.DemoDiaryRepository
+import com.hyunsikyoo.pleosapp.data.vehicle.GearState
 import com.hyunsikyoo.pleosapp.feature.calendar.CalendarScreen
 import com.hyunsikyoo.pleosapp.feature.diary.DiaryRoute
 import com.hyunsikyoo.pleosapp.feature.diary.DiaryViewModel
@@ -29,10 +33,12 @@ import java.time.LocalDateTime
 /**
  * 앱 루트: 지금 화면 + 그 위 팝업 + Toast. 화면 연결은 와이어프레임 W0 "화면 연결 지도"와 11/8 핸드오프 그대로.
  * [onLeaveApp]: 홈에서 뒤로, 또는 주행 중 뒤로(홈 대신 Pleos 앱 목록으로).
+ * [demoControls]: 디버그 빌드에서만 true. 왼쪽 아래 구석을 길게 누르면 시연 조작 패널.
  */
 @Composable
 fun CarDiaryApp(
     onLeaveApp: () -> Unit,
+    demoControls: Boolean = false,
     app: CarDiaryAppViewModel = viewModel(),
     diaryViewModel: DiaryViewModel = viewModel(),
 ) {
@@ -46,6 +52,9 @@ fun CarDiaryApp(
     val toast by app.toast.collectAsStateWithLifecycle()
     val diaryState by diaryViewModel.state.collectAsStateWithLifecycle()
     val narration by diaryViewModel.narration.collectAsStateWithLifecycle()
+    val gear by app.gear.collectAsStateWithLifecycle()
+    val noDestinationNext by app.nextTripWithoutDestination.collectAsStateWithLifecycle()
+    var demoPanelOpen by rememberSaveable { mutableStateOf(false) }
 
     val screen = stack.last()
     val today = DemoDiaryRepository.today
@@ -53,6 +62,7 @@ fun CarDiaryApp(
 
     BackHandler {
         when {
+            demoPanelOpen -> demoPanelOpen = false
             popup != AppPopup.None -> app.closePopup()
             screen == Screen.Driving -> onLeaveApp()
             !app.back() -> onLeaveApp()
@@ -156,6 +166,23 @@ fun CarDiaryApp(
         // Toast: 앱 영역 아래 가운데, 3초
         toast?.let { message ->
             CarDiaryToast(message, Modifier.align(Alignment.BottomCenter).padding(bottom = 40.dp))
+        }
+
+        if (demoControls) {
+            if (demoPanelOpen) {
+                DemoControlPanel(
+                    gear = gear,
+                    noDestinationNext = noDestinationNext,
+                    onDoor = app::onRearDoorOpened,
+                    onDrive = { app.onGear(GearState.Drive) },
+                    onPark = { app.onGear(GearState.Park) },
+                    onEndTrip = app::endTripNow,
+                    onToggleNoDestination = { app.demoNextTripWithoutDestination(!noDestinationNext) },
+                    onClose = { demoPanelOpen = false },
+                    modifier = Modifier.align(Alignment.BottomStart).padding(start = 16.dp, bottom = 24.dp),
+                )
+            }
+            DemoHotspot(onLongPress = { demoPanelOpen = !demoPanelOpen }, modifier = Modifier.align(Alignment.BottomStart))
         }
     }
 }
