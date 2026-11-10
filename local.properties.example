@@ -1,0 +1,8 @@
+# 이 파일을 복사해 local.properties로 이름을 바꾼 뒤 값을 채워 주세요.
+#   cp local.properties.example local.properties
+# local.properties는 컴퓨터마다 달라서 저장소에 올리지 않습니다 (.gitignore).
+
+# Android SDK 설치 경로 (Android Studio → Settings → Languages & Frameworks → Android SDK 맨 위 "Android SDK Location")
+#   macOS 예: /Users/<사용자이름>/Library/Android/sdk
+#   Windows 예: C\:\\Users\\<사용자이름>\\AppData\\Local\\Android\\Sdk
+sdk.dir=
