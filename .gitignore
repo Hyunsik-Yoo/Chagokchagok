@@ -9,3 +9,11 @@
 .externalNativeBuild/
 .cxx/
 .kotlin/
+
+# 초기 시안·참고 자료 (로컬에만 보관, 공개 저장소에서 제외)
+/design/
+/screens/
+/docs/notion-images/
+/docs/design-guide.md
+/docs/screen-spec.md
+/screenshot_vin.png
