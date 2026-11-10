@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "PleosApp"
+rootProject.name = "Chagokchagok"
 include(":app")

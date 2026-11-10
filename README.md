@@ -1,4 +1,4 @@
-# Pleos App — 현대자동차그룹 차량용 앱 개발 공모전
+# 차곡차곡 (Chagokchagok) — 현대자동차그룹 차량용 앱 개발 공모전
 
 - 공모전: https://appdevchallenge.auto-hmg.io/ (접수 ~2026.11.15)
 - 개발 문서: https://document.pleos.ai/docs/pleos-only/connect-sdk-pleos/

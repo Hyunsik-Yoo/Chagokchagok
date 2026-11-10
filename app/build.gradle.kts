@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.hyunsikyoo.pleosapp"
+    namespace = "com.hyunsikyoo.chagokchagok"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.hyunsikyoo.pleosapp"
+        applicationId = "com.hyunsikyoo.chagokchagok"
         // Pleos Connect 요구사항: 사이닝 키 로테이션/리니지 지원을 위해 API 28 이상
         minSdk = 28
         targetSdk = 35
