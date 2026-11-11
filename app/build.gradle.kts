@@ -53,8 +53,8 @@ dependencies {
 
     // Pleos Connect SDK — 사용하는 것만 주석 해제
     implementation(libs.pleos.vehicle)
-    // implementation(libs.pleos.navihelper)
-    // implementation(libs.pleos.tts)
-    // implementation(libs.pleos.stt)
+    implementation(libs.pleos.navihelper)
+    implementation(libs.pleos.tts)
+    implementation(libs.pleos.stt)
     implementation(libs.pleos.fusedlocation)
 }

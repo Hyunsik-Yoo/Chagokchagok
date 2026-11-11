@@ -213,6 +213,9 @@ fun ArrivalPopup(
     onPauseCountdown: (Boolean) -> Unit,
     /** 이번 트립에 달린 길. 점이 모자라면 기존 정지 지도(현재 위치 핀) */
     route: List<com.hyunsikyoo.chagokchagok.ui.designsystem.component.RouteMapPoint> = emptyList(),
+    /** 음성 인식 한 번 (Pleos STT). 결과는 받아 적은 이름, 못 알아들으면 null */
+    onListen: (onResult: (String?) -> Unit) -> Unit = { cb -> cb("공룡 공원") },
+    onCancelListen: () -> Unit = {},
 ) {
     val noDestination = destination == null
     val candidates = remember(destination) {
@@ -234,10 +237,14 @@ fun ArrivalPopup(
     }
     LaunchedEffect(step, attempt) {
         if (step == ArrivalStep.Listening) {
-            delay(2_000) // 시연: 음성 인식 결과
-            step = ArrivalStep.Heard("공룡 공원")
+            val listening = attempt
+            onListen { name ->
+                // 그 사이 다시 듣기나 뒤로 가기를 눌렀으면 늦게 온 결과는 버린다
+                if (attempt == listening && step == ArrivalStep.Listening) step = ArrivalStep.Heard(name.orEmpty())
+            }
         }
     }
+    DisposableEffect(Unit) { onDispose { onCancelListen() } }
 
     CarDiaryPopupScrim {
         when (val s = step) {

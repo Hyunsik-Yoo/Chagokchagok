@@ -1,10 +1,11 @@
 package com.hyunsikyoo.chagokchagok.feature.diary
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.hyunsikyoo.chagokchagok.data.demo.DemoDiaryRepository
 import com.hyunsikyoo.chagokchagok.data.tts.DiaryNarrator
-import com.hyunsikyoo.chagokchagok.data.tts.TimedDemoNarrator
+import com.hyunsikyoo.chagokchagok.data.tts.PleosTtsNarrator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -14,10 +15,12 @@ import kotlinx.coroutines.flow.stateIn
 /** 열려 있는 팝업 */
 enum class DiaryPopup { None, Records, Pieces, Route }
 
-class DiaryViewModel : ViewModel() {
+class DiaryViewModel(app: Application) : AndroidViewModel(app) {
 
     private val diaries = DemoDiaryRepository.diaries()
-    private val narrator: DiaryNarrator = TimedDemoNarrator(viewModelScope)
+    // Pleos TTS(ON_DEVICE). 엔진을 못 쓰면 소리 없이 형광펜만 옮긴다
+    private val tts = PleosTtsNarrator(app, viewModelScope)
+    private val narrator: DiaryNarrator = tts
 
     private val latestIndex = diaries.indexOfFirst { it.date == DemoDiaryRepository.latest().date }.coerceAtLeast(0)
     private val index = MutableStateFlow(latestIndex)
@@ -93,6 +96,6 @@ class DiaryViewModel : ViewModel() {
     fun closePopup() { _popup.value = DiaryPopup.None }
 
     override fun onCleared() {
-        narrator.stop()
+        tts.release()
     }
 }

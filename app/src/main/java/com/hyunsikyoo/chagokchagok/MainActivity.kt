@@ -28,8 +28,8 @@ class MainActivity : ComponentActivity() {
 
     private val appViewModel: CarDiaryAppViewModel by viewModels()
 
-    /** 이동 경로 기록 권한. 거절하면 경로 없이 일기를 쓴다 */
-    private val locationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
+    /** Pleos 권한(위치·내비·TTS·STT). 위험 권한만 시스템 창이 뜬다. 거절하면 그 기능 없이 동작한다 */
+    private val pleosPermissions = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { }
 
     private val demoReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -50,9 +50,8 @@ class MainActivity : ComponentActivity() {
         if (debuggable) {
             ContextCompat.registerReceiver(this, demoReceiver, IntentFilter(ACTION_DEMO), ContextCompat.RECEIVER_EXPORTED)
         }
-        if (ContextCompat.checkSelfPermission(this, PERMISSION_FUSED_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            locationPermission.launch(PERMISSION_FUSED_LOCATION)
-        }
+        val missing = PLEOS_PERMISSIONS.filter { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED }
+        if (missing.isNotEmpty()) pleosPermissions.launch(missing.toTypedArray())
         setContent {
             CarDiaryTheme {
                 if (showCatalog) {
@@ -72,6 +71,11 @@ class MainActivity : ComponentActivity() {
     companion object {
         const val EXTRA_CATALOG = "catalog"
         const val ACTION_DEMO = "com.hyunsikyoo.chagokchagok.DEMO"
-        const val PERMISSION_FUSED_LOCATION = "pleos.car.permission.FUSED_LOCATION"
+        val PLEOS_PERMISSIONS = listOf(
+            "pleos.car.permission.FUSED_LOCATION",
+            "pleos.car.permission.NAVI_ROUTE",
+            "pleos.car.permission.TTS_SERVICE",
+            "pleos.car.permission.STT_SERVICE",
+        )
     }
 }

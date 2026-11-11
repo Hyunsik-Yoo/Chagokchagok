@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.hyunsikyoo.chagokchagok.data.demo.DemoDiaryRepository
 import com.hyunsikyoo.chagokchagok.data.location.LocationAvailability
 import com.hyunsikyoo.chagokchagok.data.location.LocationTracker
+import com.hyunsikyoo.chagokchagok.data.navi.NaviSignals
+import com.hyunsikyoo.chagokchagok.data.stt.VoiceInput
 import com.hyunsikyoo.chagokchagok.data.vehicle.GearState
 import com.hyunsikyoo.chagokchagok.data.vehicle.VehicleSignals
 import com.hyunsikyoo.chagokchagok.domain.model.FamilyMember
@@ -77,6 +79,11 @@ class CarDiaryAppViewModel(app: Application) : AndroidViewModel(app) {
 
     private val signals = VehicleSignals(app)
     private val location = LocationTracker(app)
+    private val navi = NaviSignals(app)
+    private val voice = VoiceInput(app)
+
+    /** 이번 트립에서 내비 목적지에 닿았는지. 닿았으면 P가 되자마자 트립을 끝낸다 */
+    private var arrivedAtDestination = false
 
     /** 위치를 받을 수 있는지 (지원 안 함·막힘이면 경로 없이 기록) */
     val locationAvailability: StateFlow<LocationAvailability> = location.availability
@@ -129,6 +136,21 @@ class CarDiaryAppViewModel(app: Application) : AndroidViewModel(app) {
         signals.start()
         viewModelScope.launch { signals.gear.drop(1).collect(::onGear) }
         viewModelScope.launch { signals.rearDoorOpened.collect { onRearDoorOpened() } }
+        navi.start()
+        // 내비 목적지가 바뀌면 진행 중인 트립에도 반영 (시연 값보다 실제 내비가 우선)
+        viewModelScope.launch {
+            navi.destination.collect { d ->
+                if (d != null) _trip.update { it?.copy(destination = d.name, eta = d.eta ?: it.eta) }
+            }
+        }
+        // 내비 목적지 도착: 정차 중이면 바로, 아니면 P가 되자마자 트립 종료
+        viewModelScope.launch {
+            navi.arrived.collect {
+                if (_trip.value == null) return@collect
+                arrivedAtDestination = true
+                if (_gear.value == GearState.Park) endTrip()
+            }
+        }
         // 트립 중 위치 점을 경로에 쌓는다. 시연 모드는 시연 경로를 쓰고, 기록 끈 날은 쌓지 않는다
         viewModelScope.launch {
             location.points.collect { point ->
@@ -194,7 +216,9 @@ class CarDiaryAppViewModel(app: Application) : AndroidViewModel(app) {
         _gear.value = gear
         when (gear) {
             GearState.Drive -> startOrContinueDriving()
-            GearState.Park -> if (isDriving()) scheduleTripEnd()
+            GearState.Park -> if (isDriving()) {
+                if (arrivedAtDestination) endTrip() else scheduleTripEnd()
+            }
             else -> Unit
         }
     }
@@ -222,11 +246,16 @@ class CarDiaryAppViewModel(app: Application) : AndroidViewModel(app) {
             val now = LocalDateTime.now()
             val noDest = _nextTripWithoutDestination.value
             _nextTripWithoutDestination.value = false
+            arrivedAtDestination = false
+            navi.refresh()
+            // 목적지: 내비 안내 중이면 그 값, 아니면 시연 모드에서만 시연 값("할머니 댁")
+            val naviDest = navi.destination.value
+            val demoDest = _settings.value.demoMode && !noDest
             _trip.value = LiveTrip(
                 startAt = now,
                 fromPlace = "우리 집",
-                destination = if (noDest) null else "할머니 댁", // NaviHelper 목적지 연결 전 시연 값
-                eta = if (noDest) null else now.plusMinutes(100),
+                destination = if (noDest) null else naviDest?.name ?: if (demoDest) "할머니 댁" else null,
+                eta = if (noDest) null else naviDest?.eta ?: if (demoDest) now.plusMinutes(100) else null,
             )
             startDemoScript()
         }
@@ -394,8 +423,24 @@ class CarDiaryAppViewModel(app: Application) : AndroidViewModel(app) {
     fun setRecordingOffToday(off: Boolean) = _settings.update { it.copy(recordingOffToday = off) }
     fun setSeat(seat: Seat, member: FamilyMember?) = _settings.update { it.copy(seats = it.seats.seatOnly(seat, member)) }
 
+    /** 아이가 말로 장소 이름 붙이기 (W6-2). STT를 못 쓰면 시연 값으로 */
+    fun listenPlaceName(onResult: (String?) -> Unit) {
+        if (voice.available) {
+            voice.listen(onResult)
+        } else {
+            viewModelScope.launch {
+                delay(2_000)
+                onResult(if (_settings.value.demoMode) "공룡 공원" else null)
+            }
+        }
+    }
+
+    fun cancelListening() = voice.cancel()
+
     override fun onCleared() {
         signals.stop()
+        navi.stop()
+        voice.release()
         location.release()
     }
 
