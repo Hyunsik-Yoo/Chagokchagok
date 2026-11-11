@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -17,6 +19,8 @@ import com.hyunsikyoo.chagokchagok.ui.designsystem.component.CarDiaryPieceTag
 import com.hyunsikyoo.chagokchagok.ui.designsystem.component.CarDiaryPopup
 import com.hyunsikyoo.chagokchagok.ui.designsystem.component.CarDiaryPopupScrim
 import com.hyunsikyoo.chagokchagok.ui.designsystem.component.PopupAction
+import com.hyunsikyoo.chagokchagok.ui.designsystem.component.CarDiaryRouteMap
+import com.hyunsikyoo.chagokchagok.ui.designsystem.component.RouteMapMarker
 import com.hyunsikyoo.chagokchagok.ui.designsystem.foundation.CarDiaryDimens
 import com.hyunsikyoo.chagokchagok.ui.designsystem.icon.painter
 
@@ -64,6 +68,34 @@ fun PiecesPopup(state: DiaryUiState, onClose: () -> Unit) {
             ) {
                 state.allPieces.forEach { CarDiaryPieceTag(it) }
             }
+        }
+    }
+}
+
+/**
+ * 오늘 달린 길 (FusedLocation 경로). 일기 종이의 [달린 길]에서 연다.
+ * 실제 지도(OpenStreetMap) + 출발·도착 핀 + 명장면 이모지, [닫기] 하나. 경로는 차 안에만 저장하고, 지도 타일만 받아 온다는 안내를 붙인다.
+ */
+@Composable
+fun RoutePopup(state: DiaryUiState, onClose: () -> Unit) {
+    CarDiaryPopupScrim(onDismiss = onClose) {
+        CarDiaryPopup(
+            title = "오늘 달린 길",
+            subtitle = buildString {
+                append(state.from.place)
+                state.to?.let { append(" → ${it.place}") }
+                append("  ·  ${state.distanceLabel}  ·  ${state.durationLabel}")
+            },
+            actions = listOf(PopupAction("닫기", onClose, ButtonStyle.Neutral)),
+            footnote = "달린 길은 차 안에만 저장돼요. 지도 그림은 OpenStreetMap에서 받아 와요",
+        ) {
+            CarDiaryRouteMap(
+                points = state.route,
+                markers = state.routeHighlights.map { RouteMapMarker(it.point, it.emoji.painter(), it.label) },
+                startLabel = state.from.place,
+                endLabel = state.to?.place ?: "도착",
+                modifier = Modifier.fillMaxWidth().height(500.dp),
+            )
         }
     }
 }

@@ -48,11 +48,13 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     // 폰으로 보내기(W7) QR 코드 그리기
     implementation(libs.zxing.core)
+    // 달린 길 지도 (OpenStreetMap 타일, 키 없음)
+    implementation(libs.osmdroid.android)
 
     // Pleos Connect SDK — 사용하는 것만 주석 해제
     implementation(libs.pleos.vehicle)
     // implementation(libs.pleos.navihelper)
     // implementation(libs.pleos.tts)
     // implementation(libs.pleos.stt)
-    // implementation(libs.pleos.fusedlocation)
+    implementation(libs.pleos.fusedlocation)
 }

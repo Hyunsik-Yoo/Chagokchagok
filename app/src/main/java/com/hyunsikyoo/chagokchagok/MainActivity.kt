@@ -5,9 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import com.hyunsikyoo.chagokchagok.data.vehicle.GearState
@@ -25,6 +27,9 @@ import com.hyunsikyoo.chagokchagok.ui.navigation.CarDiaryAppViewModel
 class MainActivity : ComponentActivity() {
 
     private val appViewModel: CarDiaryAppViewModel by viewModels()
+
+    /** 이동 경로 기록 권한. 거절하면 경로 없이 일기를 쓴다 */
+    private val locationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
 
     private val demoReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -45,6 +50,9 @@ class MainActivity : ComponentActivity() {
         if (debuggable) {
             ContextCompat.registerReceiver(this, demoReceiver, IntentFilter(ACTION_DEMO), ContextCompat.RECEIVER_EXPORTED)
         }
+        if (ContextCompat.checkSelfPermission(this, PERMISSION_FUSED_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            locationPermission.launch(PERMISSION_FUSED_LOCATION)
+        }
         setContent {
             CarDiaryTheme {
                 if (showCatalog) {
@@ -64,5 +72,6 @@ class MainActivity : ComponentActivity() {
     companion object {
         const val EXTRA_CATALOG = "catalog"
         const val ACTION_DEMO = "com.hyunsikyoo.chagokchagok.DEMO"
+        const val PERMISSION_FUSED_LOCATION = "pleos.car.permission.FUSED_LOCATION"
     }
 }

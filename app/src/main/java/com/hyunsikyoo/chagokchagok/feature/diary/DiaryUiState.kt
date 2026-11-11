@@ -8,6 +8,7 @@ import com.hyunsikyoo.chagokchagok.domain.model.HighlightType
 import com.hyunsikyoo.chagokchagok.domain.model.Mileage
 import com.hyunsikyoo.chagokchagok.domain.model.PieceKind
 import com.hyunsikyoo.chagokchagok.domain.model.Sticker
+import com.hyunsikyoo.chagokchagok.ui.designsystem.component.RouteMapPoint
 import java.time.Duration
 
 data class RoutePointUi(val place: String, val time: String, val tag: String)
@@ -20,6 +21,9 @@ data class RecordUi(
     val emoji: FluentEmoji,
     val isHighlight: Boolean,
 )
+
+/** 지도 위 명장면 하나 (경로에서 그 시각에 가장 가까운 점) */
+data class RouteHighlightUi(val point: RouteMapPoint, val emoji: FluentEmoji, val label: String)
 
 /** 일기 화면(와이어프레임 C) 상태. 값이 없는 칸은 null → 화면에서 숨긴다 */
 data class DiaryUiState(
@@ -53,7 +57,12 @@ data class DiaryUiState(
     val mileageLabel: String,
     val mileageProgress: Float,
     val mileageCaption: String,
+    // 오늘 달린 길 (FusedLocation). 점이 2개보다 적으면 지도 버튼을 숨긴다
+    val route: List<RouteMapPoint> = emptyList(),
+    val routeHighlights: List<RouteHighlightUi> = emptyList(),
 ) {
+    val hasRoute: Boolean get() = route.size >= 2
+
     /** 기록이 3개 이하면 전체보기 숨김 */
     val showAllRecords: Boolean get() = records.size > 3
 }
@@ -96,6 +105,14 @@ fun Diary.toUiState(
         others.take(if (carCondition != null) room - 1 else room) + listOfNotNull(carCondition)
     }
 
+    // 경로: 트립 경로를 이어 붙이고, 명장면은 그 시각에 가장 가까운 점에 놓는다(도착은 도착 핀과 겹쳐서 뺀다)
+    val routePoints = trips.flatMap { it.route }.sortedBy { it.at }
+    val routeHighlights = if (routePoints.size < 2) emptyList() else
+        records.filter { it.type != HighlightType.Note && it.type != HighlightType.Arrival }.map { h ->
+            val nearest = routePoints.minBy { kotlin.math.abs(Duration.between(it.at, h.at).seconds) }
+            RouteHighlightUi(RouteMapPoint(nearest.latitude, nearest.longitude), h.type.emoji, "${DiaryFormat.time(h.at)} ${h.title}")
+        }
+
     return DiaryUiState(
         date = date,
         hasPrev = hasPrev,
@@ -128,5 +145,7 @@ fun Diary.toUiState(
         mileageLabel = DiaryFormat.distance(mileage.totalKm),
         mileageProgress = DiaryFormat.mileageProgress(mileage),
         mileageCaption = DiaryFormat.mileageCaption(mileage),
+        route = routePoints.map { RouteMapPoint(it.latitude, it.longitude) },
+        routeHighlights = routeHighlights,
     )
 }

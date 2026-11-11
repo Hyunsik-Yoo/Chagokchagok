@@ -4,12 +4,15 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.hyunsikyoo.chagokchagok.data.demo.DemoDiaryRepository
+import com.hyunsikyoo.chagokchagok.data.location.LocationAvailability
+import com.hyunsikyoo.chagokchagok.data.location.LocationTracker
 import com.hyunsikyoo.chagokchagok.data.vehicle.GearState
 import com.hyunsikyoo.chagokchagok.data.vehicle.VehicleSignals
 import com.hyunsikyoo.chagokchagok.domain.model.FamilyMember
 import com.hyunsikyoo.chagokchagok.domain.model.Highlight
 import com.hyunsikyoo.chagokchagok.domain.model.HighlightType
 import com.hyunsikyoo.chagokchagok.domain.model.Relation
+import com.hyunsikyoo.chagokchagok.domain.model.RoutePoint
 import com.hyunsikyoo.chagokchagok.domain.model.Seat
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -59,6 +62,8 @@ data class LiveTrip(
     val eta: LocalDateTime?,
     val highlights: List<Highlight> = emptyList(),
     val resumed: Boolean = false,
+    /** 지금까지 달린 경로 (FusedLocation, 시연 모드면 시연 경로) */
+    val route: List<RoutePoint> = emptyList(),
 )
 
 /**
@@ -71,6 +76,10 @@ data class LiveTrip(
 class CarDiaryAppViewModel(app: Application) : AndroidViewModel(app) {
 
     private val signals = VehicleSignals(app)
+    private val location = LocationTracker(app)
+
+    /** 위치를 받을 수 있는지 (지원 안 함·막힘이면 경로 없이 기록) */
+    val locationAvailability: StateFlow<LocationAvailability> = location.availability
 
     private val _stack = MutableStateFlow<List<Screen>>(listOf(Screen.Home))
     val stack: StateFlow<List<Screen>> = _stack.asStateFlow()
@@ -113,12 +122,20 @@ class CarDiaryAppViewModel(app: Application) : AndroidViewModel(app) {
     private var tripEndJob: Job? = null
     private var arrivalJob: Job? = null
     private var demoScriptJob: Job? = null
+    private var demoRouteJob: Job? = null
     private var toastJob: Job? = null
 
     init {
         signals.start()
         viewModelScope.launch { signals.gear.drop(1).collect(::onGear) }
         viewModelScope.launch { signals.rearDoorOpened.collect { onRearDoorOpened() } }
+        // 트립 중 위치 점을 경로에 쌓는다. 시연 모드는 시연 경로를 쓰고, 기록 끈 날은 쌓지 않는다
+        viewModelScope.launch {
+            location.points.collect { point ->
+                if (_settings.value.demoMode || _settings.value.recordingOffToday) return@collect
+                _trip.update { it?.copy(route = it.route + point) }
+            }
+        }
         // 1년 전 오늘 일기가 있으면 홈을 열 때 하루 한 번 (W8)
         if (_settings.value.specialDayAlerts) _popup.value = AppPopup.SpecialDay
     }
@@ -213,6 +230,7 @@ class CarDiaryAppViewModel(app: Application) : AndroidViewModel(app) {
             )
             startDemoScript()
         }
+        location.start()
         if (!isDriving()) _stack.update { it + Screen.Driving }
     }
 
@@ -232,6 +250,8 @@ class CarDiaryAppViewModel(app: Application) : AndroidViewModel(app) {
 
     private fun endTrip() {
         demoScriptJob?.cancel()
+        demoRouteJob?.cancel()
+        location.stop()
         val trip = _trip.value ?: return
         val recordingOff = _settings.value.recordingOffToday
         if (!recordingOff && trip.destination != null) {
@@ -273,6 +293,8 @@ class CarDiaryAppViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun leaveDriving(toDiary: Boolean) {
+        location.stop()
+        demoRouteJob?.cancel()
         _trip.value = null
         _stack.update { stack ->
             val withoutDriving = stack.filterNot { it == Screen.Driving }
@@ -288,6 +310,17 @@ class CarDiaryAppViewModel(app: Application) : AndroidViewModel(app) {
                 delay(DEMO_HIGHLIGHT_INTERVAL_MS)
                 if (_settings.value.recordingOffToday) return@forEach
                 _trip.update { it?.copy(highlights = it.highlights + highlight.copy(at = LocalDateTime.now())) }
+            }
+        }
+        // 시연 경로: 명장면이 다 쌓일 동안(4개 × 6초) 우리 집 → 할머니 댁 길을 조금씩 그린다
+        demoRouteJob?.cancel()
+        demoRouteJob = viewModelScope.launch {
+            val now = LocalDateTime.now()
+            val points = DemoDiaryRepository.demoRoute(now, now.plusMinutes(100))
+            val stepMs = DEMO_HIGHLIGHT_INTERVAL_MS * DemoDiaryRepository.drivingScript.size / points.size
+            points.forEach { p ->
+                if (!_settings.value.recordingOffToday) _trip.update { it?.copy(route = it.route + p) }
+                delay(stepMs)
             }
         }
     }
@@ -363,6 +396,7 @@ class CarDiaryAppViewModel(app: Application) : AndroidViewModel(app) {
 
     override fun onCleared() {
         signals.stop()
+        location.release()
     }
 
     /** 한 사람은 한 자리에만: 이미 다른 자리에 앉은 사람을 고르면 그 자리는 비운다 */

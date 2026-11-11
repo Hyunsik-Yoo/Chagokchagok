@@ -25,6 +25,15 @@ data class Trip(
     val passengers: List<FamilyMember>,
     /** 이어 달리기로 합친 트립 */
     val mergedFrom: List<Long> = emptyList(),
+    /** 이동 경로 (FusedLocation, 시간순). 위치를 못 받은 트립은 비어 있다 */
+    val route: List<RoutePoint> = emptyList(),
+)
+
+/** 경로 위 한 점. 차 안에만 저장하고 밖으로 보내지 않는다 */
+data class RoutePoint(
+    val latitude: Double,
+    val longitude: Double,
+    val at: LocalDateTime,
 )
 
 /** 관계 (새 가족 추가의 Tab Chip). 친구는 "그 밖에" */

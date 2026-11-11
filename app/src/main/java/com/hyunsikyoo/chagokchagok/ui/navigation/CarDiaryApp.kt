@@ -143,6 +143,7 @@ fun CarDiaryApp(
                 onConfirm = { place -> app.finishArrival(place) },
                 onLater = { app.finishArrival(place = null) },
                 onPauseCountdown = app::pauseArrivalCountdown,
+                route = trip?.route.orEmpty().map { com.hyunsikyoo.chagokchagok.ui.designsystem.component.RouteMapPoint(it.latitude, it.longitude) },
             )
             AppPopup.SendPhone -> SendPhonePopup(
                 diary = DemoDiaryRepository.diary(diaryState.date),

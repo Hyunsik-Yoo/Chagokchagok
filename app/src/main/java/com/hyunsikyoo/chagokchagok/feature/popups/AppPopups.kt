@@ -211,6 +211,8 @@ fun ArrivalPopup(
     onConfirm: (String?) -> Unit,
     onLater: () -> Unit,
     onPauseCountdown: (Boolean) -> Unit,
+    /** 이번 트립에 달린 길. 점이 모자라면 기존 정지 지도(현재 위치 핀) */
+    route: List<com.hyunsikyoo.chagokchagok.ui.designsystem.component.RouteMapPoint> = emptyList(),
 ) {
     val noDestination = destination == null
     val candidates = remember(destination) {
@@ -249,7 +251,15 @@ fun ArrivalPopup(
                 ),
             ) {
                 Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
-                    StaticMap(Modifier.width(500.dp).height(500.dp))
+                    if (route.size >= 2) {
+                        com.hyunsikyoo.chagokchagok.ui.designsystem.component.CarDiaryRouteMap(
+                            points = route,
+                            endLabel = chosen ?: "여기",
+                            modifier = Modifier.width(500.dp).height(500.dp),
+                        )
+                    } else {
+                        StaticMap(Modifier.width(500.dp).height(500.dp))
+                    }
                     Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         val rows = listOfNotNull(named?.let { PlaceCandidate(it, "${childName}이가 붙인 이름") }) + candidates
                         rows.forEachIndexed { i, c ->

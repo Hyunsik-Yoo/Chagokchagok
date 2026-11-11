@@ -118,6 +118,7 @@ fun DiaryScreen(
         overlay = when (popup) {
             DiaryPopup.Records -> { { RecordsPopup(state, onClose = onClosePopup) } }
             DiaryPopup.Pieces -> { { PiecesPopup(state, onClose = onClosePopup) } }
+            DiaryPopup.Route -> { { RoutePopup(state, onClose = onClosePopup) } }
             DiaryPopup.None -> null
         },
     ) {
@@ -131,6 +132,7 @@ fun DiaryScreen(
                     state = state,
                     onToggleNarration = onToggleNarration,
                     onSendToPhone = onSendToPhone,
+                    onOpenRoute = { onOpenPopup(DiaryPopup.Route) },
                     modifier = Modifier.weight(1f).fillMaxHeight(),
                 )
                 SideColumn(
@@ -209,6 +211,7 @@ private fun DiaryPaper(
     state: DiaryUiState,
     onToggleNarration: () -> Unit,
     onSendToPhone: () -> Unit,
+    onOpenRoute: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     CarDiaryCard(modifier = modifier, shadow = CardShadow.Hard) {
@@ -245,6 +248,10 @@ private fun DiaryPaper(
                         style = ButtonStyle.Secondary,
                         icon = if (state.ttsAvailable) CarDiaryIcons.Send else CarDiaryIcons.Smartphone,
                     )
+                    // 오늘 달린 길 (위치를 받은 날만)
+                    if (state.hasRoute) {
+                        CarDiaryButton("달린 길", onClick = onOpenRoute, style = ButtonStyle.Neutral, icon = CarDiaryIcons.MapPin)
+                    }
                 }
             }
             // 8 스티커: 글을 가리지 않는 고정 빈자리

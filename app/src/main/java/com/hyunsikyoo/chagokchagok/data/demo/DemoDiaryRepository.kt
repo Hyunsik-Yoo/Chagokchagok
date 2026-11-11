@@ -9,6 +9,7 @@ import com.hyunsikyoo.chagokchagok.domain.model.Mileage
 import com.hyunsikyoo.chagokchagok.domain.model.Piece
 import com.hyunsikyoo.chagokchagok.domain.model.PieceKind
 import com.hyunsikyoo.chagokchagok.domain.model.Relation
+import com.hyunsikyoo.chagokchagok.domain.model.RoutePoint
 import com.hyunsikyoo.chagokchagok.domain.model.Place
 import com.hyunsikyoo.chagokchagok.domain.model.Seat
 import com.hyunsikyoo.chagokchagok.domain.model.Sticker
@@ -62,6 +63,7 @@ object DemoDiaryRepository {
         endPlace = Place("할머니 댁"),
         distanceKm = 87.0,
         passengers = listOf(dad, mom, jun),
+        route = demoRoute(at(10, 40), at(12, 20)),
     )
 
     /** 그날 기록 전체 (시간순) — 와이어프레임 C 명장면 팝업 예시 */
@@ -126,7 +128,7 @@ object DemoDiaryRepository {
         val start = date.atTime(10, 0)
         return diary.copy(
             date = date,
-            trips = listOf(trip.copy(id = date.toEpochDay(), startAt = start, endAt = start.plusMinutes(minutes), endPlace = Place(place), distanceKm = km)),
+            trips = listOf(trip.copy(id = date.toEpochDay(), startAt = start, endAt = start.plusMinutes(minutes), endPlace = Place(place), distanceKm = km, route = emptyList())),
             weather = WeatherSummary(weather, 15),
             title = title,
             sentences = sentences,
@@ -180,6 +182,30 @@ object DemoDiaryRepository {
 
     /** 날짜순 일기 목록 (숨긴 일기 제외). 가장 최근 "긴" 일기는 [latest] */
     fun diaries(): List<Diary> = (listOf(yearAgo) + olderDiaries + diary + shortDiaries).filterNot { it.hidden }.sortedBy { it.date }
+
+    /**
+     * 시연 경로: 서울 마포(우리 집) → 올림픽대로·팔당 → 양평(할머니 댁). 실제 기록이면 FusedLocation 점들이 들어간다.
+     * 꺾이는 점(위도, 경도) 사이를 고르게 나눠 시간순 점으로 만든다.
+     */
+    // getter: 위쪽 trip 초기화에서 먼저 불리므로 필드로 두면 아직 null이다
+    private val demoWaypoints: List<Pair<Double, Double>> get() = listOf(
+        37.5563 to 126.9236, 37.5440 to 126.9520, 37.5290 to 126.9940, 37.5180 to 127.0440,
+        37.5240 to 127.0930, 37.5440 to 127.1250, 37.5580 to 127.1720, 37.5650 to 127.2160,
+        37.5540 to 127.2570, 37.5380 to 127.3030, 37.5180 to 127.3480, 37.5060 to 127.3990,
+        37.4950 to 127.4420, 37.4890 to 127.4870,
+    )
+
+    fun demoRoute(start: LocalDateTime, end: LocalDateTime, steps: Int = 60): List<RoutePoint> {
+        val total = java.time.Duration.between(start, end).seconds
+        return (0..steps).map { i ->
+            val t = i.toDouble() / steps
+            val f = t * (demoWaypoints.size - 1)
+            val a = demoWaypoints[f.toInt().coerceAtMost(demoWaypoints.size - 2)]
+            val b = demoWaypoints[(f.toInt() + 1).coerceAtMost(demoWaypoints.size - 1)]
+            val k = f - f.toInt().coerceAtMost(demoWaypoints.size - 2)
+            RoutePoint(a.first + (b.first - a.first) * k, a.second + (b.second - a.second) * k, start.plusSeconds((total * t).toLong()))
+        }
+    }
 
     fun diary(date: LocalDate): Diary? = diaries().firstOrNull { it.date == date }
 

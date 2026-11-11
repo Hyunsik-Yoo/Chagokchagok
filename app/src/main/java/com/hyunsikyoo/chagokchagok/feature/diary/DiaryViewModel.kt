@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
 /** 열려 있는 팝업 */
-enum class DiaryPopup { None, Records, Pieces }
+enum class DiaryPopup { None, Records, Pieces, Route }
 
 class DiaryViewModel : ViewModel() {
 

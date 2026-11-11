@@ -94,3 +94,4 @@ adb shell am start -n com.hyunsikyoo.chagokchagok/.MainActivity --ez catalog tru
 - 차량 퍼미션은 `pleos.car.permission.*` 형식으로 `AndroidManifest.xml`에 선언. 사용하는 도메인 것만, App Market 승인 범위 내에서.
 - Vehicle SDK 사용 흐름: `Vehicle(context).initialize()` → `getXxx()` 도메인 객체 → Capability/Get/Set/Callback → `release()`
 - 서드파티 라이선스: Asta Sans(SIL OFL 1.1), Feather Icons(MIT), Fluent Emoji(MIT) → `docs/licenses/`
+- 지도: osmdroid(Apache 2.0) + OpenStreetMap 타일(© OpenStreetMap contributors, ODbL). 공개 타일 서버는 대량 사용이 금지라 시연용으로만 쓰고, 출시 땐 타일 서버를 따로 둔다
