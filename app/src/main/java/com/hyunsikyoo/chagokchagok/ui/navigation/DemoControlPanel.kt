@@ -27,7 +27,7 @@ import com.hyunsikyoo.chagokchagok.ui.designsystem.foundation.CarDiaryTypography
 import com.hyunsikyoo.chagokchagok.ui.designsystem.foundation.hardShadow
 
 /**
- * 시연 조작 (디버그 빌드만). PT에서 adb 없이 차 신호를 흉내 낸다.
+ * 시연 조작 (debug 빌드와 BuildConfig.DEMO_CONTROLS가 켜진 release 빌드). PT에서 adb 없이 차 신호를 흉내 낸다.
  * 앱 영역 왼쪽 아래 구석(보이지 않는 칸)을 길게 누르면 열리고 닫힌다.
  * 버튼은 adb 시연 신호(door, drive, park, end, nodest)와 같은 길로 들어간다.
  */
@@ -78,7 +78,7 @@ fun DemoControlPanel(
             size = ButtonSize.Small,
         )
         CarDiaryButton("닫기", onClose, full, style = ButtonStyle.Neutral, size = ButtonSize.Small)
-        CarDiaryText("왼쪽 아래 구석 길게 누르면 열고 닫혀요. 디버그 빌드만", style = CarDiaryTypography.LabelSmall, color = CarDiaryColors.TextSub)
+        CarDiaryText("왼쪽 아래 구석을 길게 누르면 열고 닫혀요", style = CarDiaryTypography.LabelSmall, color = CarDiaryColors.TextSub)
     }
 }
 

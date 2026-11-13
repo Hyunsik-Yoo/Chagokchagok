@@ -17,3 +17,7 @@
 /docs/design-guide.md
 /docs/screen-spec.md
 /screenshot_vin.png
+
+# 릴리스 서명 키 (저장소에 올리지 않음)
+/keystore/
+/keystore.properties
